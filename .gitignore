@@ -617,3 +617,6 @@ FodyWeavers.xsd
 
 # add .vscode to ignore
 /xr-orchestra/.vscode/
+xr-orchestra/Assets/XR/XRGeneralSettingsPerBuildTarget.asset
+
+xr-orchestra/ProjectSettings/EditorBuildSettings.asset
