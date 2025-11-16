@@ -19,6 +19,7 @@ public class MotionRecorder : MonoBehaviour
     [SerializeField] private GameObject headGhostPrefab;
     [SerializeField] private GameObject leftHandGhostPrefab;
     [SerializeField] private GameObject rightHandGhostPrefab;
+    [SerializeField] private GameObject smoothGhostPrefab;
 
     private RecorderState state = RecorderState.Idle;
     private MotionRecording currentRecording;
@@ -26,9 +27,9 @@ public class MotionRecorder : MonoBehaviour
     private float sampleTimer;
     private float sampleInterval;
 
-    private GameObject headGhost;
-    private GameObject leftHandGhost;
-    private GameObject rightHandGhost;
+    private GameObject ghostRoot;
+    private GameObject actualGhostParent;
+    private GameObject smoothGhostInstance;
 
     void Start()
     {
@@ -117,33 +118,61 @@ public class MotionRecorder : MonoBehaviour
 
     private void SpawnGhosts()
     {
+        ghostRoot = new GameObject("Ghost");
+        ghostRoot.transform.SetParent(wrapper);
+        ghostRoot.transform.localPosition = Vector3.zero;
+        ghostRoot.transform.localRotation = Quaternion.identity;
+
+        actualGhostParent = new GameObject("ActualGhost");
+        actualGhostParent.transform.SetParent(ghostRoot.transform);
+        actualGhostParent.transform.localPosition = Vector3.zero;
+        actualGhostParent.transform.localRotation = Quaternion.identity;
+
+        GameObject headGhost = null;
+        GameObject leftHandGhost = null;
+        GameObject rightHandGhost = null;
+
         if (headGhostPrefab != null && currentRecording.headSnapshots.Count > 0)
         {
-            headGhost = Instantiate(headGhostPrefab, wrapper);
+            headGhost = Instantiate(headGhostPrefab, actualGhostParent.transform);
             var player = headGhost.AddComponent<MotionPlayer>();
             player.Initialize(currentRecording.headSnapshots, currentRecording.duration);
         }
 
         if (leftHandGhostPrefab != null && currentRecording.leftHandSnapshots.Count > 0)
         {
-            leftHandGhost = Instantiate(leftHandGhostPrefab, wrapper);
+            leftHandGhost = Instantiate(leftHandGhostPrefab, actualGhostParent.transform);
             var player = leftHandGhost.AddComponent<MotionPlayer>();
             player.Initialize(currentRecording.leftHandSnapshots, currentRecording.duration);
         }
 
         if (rightHandGhostPrefab != null && currentRecording.rightHandSnapshots.Count > 0)
         {
-            rightHandGhost = Instantiate(rightHandGhostPrefab, wrapper);
+            rightHandGhost = Instantiate(rightHandGhostPrefab, actualGhostParent.transform);
             var player = rightHandGhost.AddComponent<MotionPlayer>();
             player.Initialize(currentRecording.rightHandSnapshots, currentRecording.duration);
+        }
+
+        if (smoothGhostPrefab != null)
+        {
+            smoothGhostInstance = Instantiate(smoothGhostPrefab, ghostRoot.transform);
+            smoothGhostInstance.name = "SmoothGhost";
+            
+            var initializer = smoothGhostInstance.GetComponent<SmoothGhostInitializer>();
+            if (initializer != null)
+            {
+                initializer.Initialize(
+                    headGhost != null ? headGhost.transform : null,
+                    leftHandGhost != null ? leftHandGhost.transform : null,
+                    rightHandGhost != null ? rightHandGhost.transform : null
+                );
+            }
         }
     }
 
     private void DestroyGhosts()
     {
-        if (headGhost != null) Destroy(headGhost);
-        if (leftHandGhost != null) Destroy(leftHandGhost);
-        if (rightHandGhost != null) Destroy(rightHandGhost);
+        if (ghostRoot != null) Destroy(ghostRoot);
     }
 
     public RecorderState GetState()
