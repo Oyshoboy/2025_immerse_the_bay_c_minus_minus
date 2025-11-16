@@ -6,6 +6,8 @@ using TMPro;
 
 public class InstrumentManager : MonoBehaviour
 {
+    public enum InstrumentState { Idle, Recording, Playing }
+
     [Header("Debug Display")]
     [SerializeField] private TMP_Text debugText;
     [SerializeField] private int maxDebugLines = 10;
@@ -17,18 +19,36 @@ public class InstrumentManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GodmodeController godmodeController;
+    [SerializeField] private MotionRecorder motionRecorder;
+    [SerializeField] private Material radialProgressMaterial;
+    [SerializeField] private GameObject radialProgressObject;
 
     private Queue<string> debugMessages = new Queue<string>();
+    private InstrumentState instrumentState = InstrumentState.Idle;
+    private RadialProgressController radialProgressController;
+
+    private void Awake()
+    {
+        if (radialProgressObject != null)
+        {
+            radialProgressController = radialProgressObject.GetComponent<RadialProgressController>();
+        }
+    }
 
     public void InteractionCapture(string message)
     {
-        if (string.IsNullOrEmpty(message)) return;
+        // if (instrumentState == InstrumentState.Playing) return;
+        // if (string.IsNullOrEmpty(message)) return;
 
-        string timestamp = Time.time.ToString("F2");
-        string formattedMessage = $"[{timestamp}s] {message}";
+        TryStartRecording();
+
+        // string timestamp = Time.time.ToString("F2");
+        // string formattedMessage = $"[{timestamp}s] {message}";
         
-        AddDebugMessage(formattedMessage);
+        // AddDebugMessage(formattedMessage);
+        godmodeController.TriggerMusicExternally();
 
+        if (string.IsNullOrEmpty(message)) return;
         OVRInput.Controller controller = message.ToLower().Contains("left")
             ? OVRInput.Controller.LTouch
             : message.ToLower().Contains("right")
@@ -36,12 +56,14 @@ public class InstrumentManager : MonoBehaviour
                 : defaultHapticController;
 
         TriggerHaptic(controller);
-        godmodeController.TriggerMusicExternally();
     }
 
     public void InteractionCapture(Collider collider, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        if (instrumentState == InstrumentState.Playing) return;
         if (collider == null) return;
+
+        TryStartRecording();
 
         string timestamp = Time.time.ToString("F2");
         string objectName = collider.gameObject.name;
@@ -58,7 +80,10 @@ public class InstrumentManager : MonoBehaviour
 
     public void InteractionCapture(GameObject target, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        if (instrumentState == InstrumentState.Playing) return;
         if (target == null) return;
+
+        TryStartRecording();
 
         string timestamp = Time.time.ToString("F2");
         string objectName = target.name;
@@ -70,6 +95,22 @@ public class InstrumentManager : MonoBehaviour
         if (controller != OVRInput.Controller.None)
         {
             TriggerHaptic(controller);
+        }
+    }
+
+    private void TryStartRecording()
+    {
+        if (instrumentState == InstrumentState.Idle && motionRecorder != null)
+        {
+            instrumentState = InstrumentState.Recording;
+            motionRecorder.StartRecordingExternally();
+            
+            if (radialProgressController != null)
+            {
+                float duration = motionRecorder.GetRecordingDuration();
+                radialProgressController.SetCooldownDuration(duration);
+                radialProgressController.StartCooldown();
+            }
         }
     }
 
@@ -102,6 +143,48 @@ public class InstrumentManager : MonoBehaviour
         if (debugText == null) return;
 
         debugText.text = string.Join("\n", debugMessages);
+    }
+
+    private void Update()
+    {
+        if (instrumentState == InstrumentState.Recording)
+        {
+            UpdateRecordingProgress();
+        }
+    }
+
+    private void UpdateRecordingProgress()
+    {
+        if (motionRecorder == null) return;
+
+        if (motionRecorder.GetState() == MotionRecorder.RecorderState.Playing)
+        {
+            OnRecordingComplete();
+            return;
+        }
+
+        float remainingTime = motionRecorder.GetRecordingDuration() - motionRecorder.GetRecordingTimer();
+        int countdown = Mathf.CeilToInt(remainingTime);
+        
+        if (debugText != null)
+        {
+            debugText.text = $"Recording {countdown}...";
+        }
+    }
+
+    private void OnRecordingComplete()
+    {
+        instrumentState = InstrumentState.Playing;
+        
+        if (radialProgressObject != null)
+        {
+            radialProgressObject.SetActive(false);
+        }
+        
+        if (debugText != null)
+        {
+            debugText.text = "Playing...";
+        }
     }
 }
 

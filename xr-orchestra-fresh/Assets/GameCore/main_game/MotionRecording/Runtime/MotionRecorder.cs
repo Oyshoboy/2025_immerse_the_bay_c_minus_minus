@@ -65,6 +65,12 @@ public class MotionRecorder : MonoBehaviour
         }
     }
 
+    public void StartRecordingExternally(){
+        if(state == RecorderState.Idle){
+            StartRecording();
+        }
+    }
+
     private void StartRecording()
     {
         state = RecorderState.Recording;
@@ -125,12 +131,6 @@ public class MotionRecorder : MonoBehaviour
         state = RecorderState.Playing;
         currentRecording.duration = recordingTimer;
         SpawnGhosts();
-        
-        ghostCount++;
-        if (ghostCount < maxGhosts)
-        {
-            StartRecording();
-        }
     }
 
     private void SpawnGhosts()
@@ -202,6 +202,16 @@ public class MotionRecorder : MonoBehaviour
     public RecorderState GetState()
     {
         return state;
+    }
+
+    public float GetRecordingDuration()
+    {
+        return recordingDuration;
+    }
+
+    public float GetRecordingTimer()
+    {
+        return recordingTimer;
     }
 
     public void ResetToIdle()
