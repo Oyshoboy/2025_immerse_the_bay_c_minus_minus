@@ -269,11 +269,13 @@ public class InstrumentManager : MonoBehaviour
     {
         if (activeGhost == null) return;
         
-        Vector3 ghostPosition = activeGhost.transform.position;
+        var ghostInitializer = activeGhost.GetComponentInChildren<SmoothGhostInitializer>();
+
+        var targetPosition = ghostInitializer.GetTargetPosition();
         
         if (dummyFXObject != null)
         {
-            pendingDummyFX = Instantiate(dummyFXObject, ghostPosition, Quaternion.identity);
+            pendingDummyFX = Instantiate(dummyFXObject, targetPosition.position, targetPosition.rotation);
             pendingForceVelocity = punchVelocity;
             Destroy(pendingDummyFX, 5f);
         }

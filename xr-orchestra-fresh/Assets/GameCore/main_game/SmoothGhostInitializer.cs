@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SmoothGhostInitializer : MonoBehaviour
@@ -19,6 +20,11 @@ public class SmoothGhostInitializer : MonoBehaviour
         
         if (smoothRightHandTracker != null && rightHandTarget != null)
             smoothRightHandTracker.SetTarget(rightHandTarget);
+    }
+
+    public Transform GetTargetPosition()
+    {
+        return smoothHeadTracker.transform;
     }
 }
 
