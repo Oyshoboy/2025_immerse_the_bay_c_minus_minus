@@ -431,8 +431,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 30
-  rotationSmoothness: 30
+  positionSmoothness: 50
+  rotationSmoothness: 50
 --- !u!114 &1923078588463814971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,8 +554,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 30
-  rotationSmoothness: 30
+  positionSmoothness: 50
+  rotationSmoothness: 50
 --- !u!54 &8506612153820550707
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -666,8 +666,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 30
-  rotationSmoothness: 30
+  positionSmoothness: 50
+  rotationSmoothness: 50
 --- !u!114 &5369835567827564450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,7 +703,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3217875416557492779, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.025
+      value: -0.015
       objectReference: {fileID: 0}
     - target: {fileID: 3217875416557492779, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -773,7 +773,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3217875416557492779, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.025
+      value: -0.015
       objectReference: {fileID: 0}
     - target: {fileID: 3217875416557492779, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalPosition.z

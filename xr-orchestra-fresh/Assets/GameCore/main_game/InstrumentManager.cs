@@ -23,7 +23,6 @@ public class InstrumentManager : MonoBehaviour
     [SerializeField] private Material radialProgressMaterial;
     [SerializeField] private GameObject radialProgressObject;
     [SerializeField] private GameObject dummyFXObject;
-    [SerializeField] private float dummyUpwardForce = 2f;
 
     [Header("Debug State")]
     [SerializeField] private InstrumentState debugInstrumentState;
@@ -40,6 +39,9 @@ public class InstrumentManager : MonoBehaviour
     private GameObject pendingDummyFX;
     private Vector3 pendingForceVelocity;
 
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip punchSound;
+
     private void Awake()
     {
         if (radialProgressObject != null)
@@ -50,15 +52,8 @@ public class InstrumentManager : MonoBehaviour
 
     public void InteractionCapture(string message)
     {
-        // if (instrumentState == InstrumentState.Playing) return;
-        // if (string.IsNullOrEmpty(message)) return;
-
         TryStartRecording();
 
-        // string timestamp = Time.time.ToString("F2");
-        // string formattedMessage = $"[{timestamp}s] {message}";
-        
-        // AddDebugMessage(formattedMessage);
         godmodeController.TriggerMusicExternally();
 
         if (string.IsNullOrEmpty(message)) return;
@@ -176,14 +171,14 @@ public class InstrumentManager : MonoBehaviour
     {
         if (pendingDummyFX != null)
         {
+            PlayPunchSound();
             Rigidbody rb = pendingDummyFX.GetComponent<Rigidbody>();
             if (rb == null)
             {
                 rb = pendingDummyFX.AddComponent<Rigidbody>();
             }
             
-            Vector3 forceWithUpward = pendingForceVelocity + (Vector3.up * dummyUpwardForce);
-            rb.AddForce(forceWithUpward * rb.mass, ForceMode.Impulse);
+            rb.AddForce(pendingForceVelocity * rb.mass, ForceMode.Impulse);
             pendingDummyFX = null;
             pendingForceVelocity = Vector3.zero;
         }
@@ -297,6 +292,13 @@ public class InstrumentManager : MonoBehaviour
         }
         
         lastStatusText = "";
+    }
+
+    private void PlayPunchSound()
+    {
+       float pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+       audioSource.pitch = pitch;
+       audioSource.PlayOneShot(punchSound);
     }
 }
 
