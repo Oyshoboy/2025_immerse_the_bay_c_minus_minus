@@ -24,10 +24,18 @@ public class InstrumentManager : MonoBehaviour
     [SerializeField] private GameObject radialProgressObject;
     [SerializeField] private GameObject dummyFXObject;
 
+    [Header("Debug State")]
+    [SerializeField] private InstrumentState debugInstrumentState;
+    [SerializeField] private bool debugHasActiveGhost;
+    [SerializeField] private float debugRecordingProgress;
+
+    private static bool isAnyInstrumentRecording = false;
+
     private Queue<string> debugMessages = new Queue<string>();
     private InstrumentState instrumentState = InstrumentState.Idle;
     private RadialProgressController radialProgressController;
     private GameObject activeGhost;
+    private string lastStatusText = "";
 
     private void Awake()
     {
@@ -102,8 +110,11 @@ public class InstrumentManager : MonoBehaviour
 
     private void TryStartRecording()
     {
+        if (isAnyInstrumentRecording) return;
+        
         if (instrumentState == InstrumentState.Idle && motionRecorder != null)
         {
+            isAnyInstrumentRecording = true;
             instrumentState = InstrumentState.Recording;
             motionRecorder.StartRecordingExternally(this);
             
@@ -151,6 +162,41 @@ public class InstrumentManager : MonoBehaviour
         {
             UpdateRecordingProgress();
         }
+        else if (instrumentState == InstrumentState.Idle)
+        {
+            UpdateIdleStatus();
+        }
+        UpdateDebugInfo();
+    }
+
+    private void UpdateIdleStatus()
+    {
+        if (debugText == null) return;
+
+        string targetStatus = isAnyInstrumentRecording ? "busy" : "ready";
+        
+        if (lastStatusText != targetStatus)
+        {
+            debugText.text = targetStatus;
+            lastStatusText = targetStatus;
+        }
+    }
+
+    private void UpdateDebugInfo()
+    {
+        debugInstrumentState = instrumentState;
+        debugHasActiveGhost = activeGhost != null;
+        
+        if (instrumentState == InstrumentState.Recording && motionRecorder != null)
+        {
+            float currentTime = motionRecorder.GetRecordingTimer();
+            float totalDuration = motionRecorder.GetRecordingDuration();
+            debugRecordingProgress = totalDuration > 0 ? (currentTime / totalDuration) : 0f;
+        }
+        else
+        {
+            debugRecordingProgress = 0f;
+        }
     }
 
     private void UpdateRecordingProgress()
@@ -178,11 +224,13 @@ public class InstrumentManager : MonoBehaviour
         if (debugText != null)
         {
             debugText.text = $"Recording {countdown}...";
+            lastStatusText = debugText.text;
         }
     }
 
     private void OnRecordingComplete()
     {
+        isAnyInstrumentRecording = false;
         instrumentState = InstrumentState.Playing;
         
         if (motionRecorder != null)
@@ -198,6 +246,7 @@ public class InstrumentManager : MonoBehaviour
         if (debugText != null)
         {
             debugText.text = "Playing...";
+            lastStatusText = debugText.text;
         }
     }
 
@@ -218,10 +267,7 @@ public class InstrumentManager : MonoBehaviour
             radialProgressObject.SetActive(true);
         }
         
-        if (debugText != null)
-        {
-            debugText.text = "";
-        }
+        lastStatusText = "";
     }
 }
 

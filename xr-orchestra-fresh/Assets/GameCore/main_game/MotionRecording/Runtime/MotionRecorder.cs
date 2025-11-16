@@ -24,6 +24,14 @@ public class MotionRecorder : MonoBehaviour
     [SerializeField] private GameObject smoothGhostPrefab;
     [SerializeField] private int maxGhosts = 5;
 
+    [Header("Debug Info")]
+    [SerializeField] private RecorderState debugState;
+    [SerializeField] private float debugRecordingTimer;
+    [SerializeField] private int debugHeadSnapshotCount;
+    [SerializeField] private int debugLeftHandSnapshotCount;
+    [SerializeField] private int debugRightHandSnapshotCount;
+    [SerializeField] private int debugActiveGhostCount;
+
     private RecorderState state = RecorderState.Idle;
     private MotionRecording currentRecording;
     private float recordingTimer;
@@ -55,6 +63,17 @@ public class MotionRecorder : MonoBehaviour
     {
         HandleInput();
         UpdateRecording();
+        UpdateDebugInfo();
+    }
+
+    private void UpdateDebugInfo()
+    {
+        debugState = state;
+        debugRecordingTimer = recordingTimer;
+        debugHeadSnapshotCount = currentRecording?.headSnapshots.Count ?? 0;
+        debugLeftHandSnapshotCount = currentRecording?.leftHandSnapshots.Count ?? 0;
+        debugRightHandSnapshotCount = currentRecording?.rightHandSnapshots.Count ?? 0;
+        debugActiveGhostCount = ghostRoots.Count;
     }
 
     private void HandleInput()
