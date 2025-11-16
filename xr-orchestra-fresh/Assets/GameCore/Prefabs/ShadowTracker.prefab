@@ -113,6 +113,7 @@ MonoBehaviour:
   target: {fileID: 0}
   positionSmoothness: 25
   rotationSmoothness: 25
+  lockedRotationAxis: 0
 --- !u!1 &1687579394144991744
 GameObject:
   m_ObjectHideFlags: 0
@@ -371,6 +372,7 @@ MonoBehaviour:
   target: {fileID: 0}
   positionSmoothness: 25
   rotationSmoothness: 25
+  lockedRotationAxis: 0
 --- !u!1 &3257007661358232762
 GameObject:
   m_ObjectHideFlags: 0
@@ -989,7 +991,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6429775953307143091}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0.13052616, w: 0.9914449}
   m_LocalPosition: {x: -0.317, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -997,7 +999,7 @@ Transform:
   - {fileID: 1643910287576659671}
   - {fileID: 6398597741398735505}
   m_Father: {fileID: 5462614476408613585}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 15}
 --- !u!114 &5870727998789332561
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1013,6 +1015,7 @@ MonoBehaviour:
   target: {fileID: 0}
   positionSmoothness: 25
   rotationSmoothness: 25
+  lockedRotationAxis: 0
 --- !u!1 &7264802425704425090
 GameObject:
   m_ObjectHideFlags: 0
@@ -1481,7 +1484,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2724428641836173964, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalScale.x
-      value: -1
+      value: -0.93384
       objectReference: {fileID: 0}
     - target: {fileID: 3217875416557492779, guid: d365f74f6e583483cabcae5d1b2a9a8c, type: 3}
       propertyPath: m_LocalPosition.x
