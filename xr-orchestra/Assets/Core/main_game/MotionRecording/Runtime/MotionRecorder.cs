@@ -34,6 +34,7 @@ public class MotionRecorder : MonoBehaviour
     {
         currentRecording = new MotionRecording();
         sampleInterval = 1f / sampleRate;
+        Invoke(nameof(StartRecording), 5f);
     }
 
     void Update()
