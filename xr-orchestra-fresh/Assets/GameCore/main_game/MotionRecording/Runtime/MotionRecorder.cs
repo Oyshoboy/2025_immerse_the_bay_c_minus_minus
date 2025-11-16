@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MotionRecorder : MonoBehaviour
 {
-    public enum RecorderState { Idle, Recording, Playing }
+    public enum RecorderState { Idle, Recording }
 
     [Header("Tracking Targets")]
     [SerializeField] private Transform wrapper;
@@ -34,6 +34,7 @@ public class MotionRecorder : MonoBehaviour
 
     private List<GameObject> ghostRoots = new List<GameObject>();
     private int ghostCount = 0;
+    private InstrumentManager currentInstrumentManager;
 
     void Start()
     {
@@ -65,8 +66,9 @@ public class MotionRecorder : MonoBehaviour
         }
     }
 
-    public void StartRecordingExternally(){
+    public void StartRecordingExternally(InstrumentManager instrumentManager){
         if(state == RecorderState.Idle){
+            currentInstrumentManager = instrumentManager;
             StartRecording();
         }
     }
@@ -128,9 +130,9 @@ public class MotionRecorder : MonoBehaviour
 
     private void StopRecording()
     {
-        state = RecorderState.Playing;
         currentRecording.duration = recordingTimer;
         SpawnGhosts();
+        state = RecorderState.Idle;
     }
 
     private void SpawnGhosts()
@@ -184,6 +186,12 @@ public class MotionRecorder : MonoBehaviour
                     rightHandGhost != null ? rightHandGhost.transform : null
                 );
             }
+            
+            var punchDetector = smoothGhostInstance.GetComponentInChildren<GhostPunchDetector>();
+            if (punchDetector != null && currentInstrumentManager != null)
+            {
+                punchDetector.SetInstrumentManager(currentInstrumentManager);
+            }
         }
         
         ghostRoots.Add(ghostRoot);
@@ -219,6 +227,23 @@ public class MotionRecorder : MonoBehaviour
         state = RecorderState.Idle;
         DestroyGhosts();
         currentRecording.Clear();
+    }
+
+    public GameObject GetLastSpawnedGhost()
+    {
+        if (ghostRoots.Count > 0)
+        {
+            return ghostRoots[ghostRoots.Count - 1];
+        }
+        return null;
+    }
+
+    public void RemoveGhost(GameObject ghost)
+    {
+        if (ghost == null) return;
+        
+        ghostRoots.Remove(ghost);
+        Destroy(ghost);
     }
 }
 

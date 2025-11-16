@@ -22,10 +22,12 @@ public class InstrumentManager : MonoBehaviour
     [SerializeField] private MotionRecorder motionRecorder;
     [SerializeField] private Material radialProgressMaterial;
     [SerializeField] private GameObject radialProgressObject;
+    [SerializeField] private GameObject dummyFXObject;
 
     private Queue<string> debugMessages = new Queue<string>();
     private InstrumentState instrumentState = InstrumentState.Idle;
     private RadialProgressController radialProgressController;
+    private GameObject activeGhost;
 
     private void Awake()
     {
@@ -103,7 +105,7 @@ public class InstrumentManager : MonoBehaviour
         if (instrumentState == InstrumentState.Idle && motionRecorder != null)
         {
             instrumentState = InstrumentState.Recording;
-            motionRecorder.StartRecordingExternally();
+            motionRecorder.StartRecordingExternally(this);
             
             if (radialProgressController != null)
             {
@@ -155,7 +157,7 @@ public class InstrumentManager : MonoBehaviour
     {
         if (motionRecorder == null) return;
 
-        if (motionRecorder.GetState() == MotionRecorder.RecorderState.Playing)
+        if (motionRecorder.GetState() == MotionRecorder.RecorderState.Idle)
         {
             OnRecordingComplete();
             return;
@@ -183,6 +185,11 @@ public class InstrumentManager : MonoBehaviour
     {
         instrumentState = InstrumentState.Playing;
         
+        if (motionRecorder != null)
+        {
+            activeGhost = motionRecorder.GetLastSpawnedGhost();
+        }
+        
         if (radialProgressObject != null)
         {
             radialProgressObject.SetActive(false);
@@ -191,6 +198,29 @@ public class InstrumentManager : MonoBehaviour
         if (debugText != null)
         {
             debugText.text = "Playing...";
+        }
+    }
+
+    public void OnGhostPunched()
+    {
+        if (activeGhost == null) return;
+        
+        if (motionRecorder != null)
+        {
+            motionRecorder.RemoveGhost(activeGhost);
+        }
+        
+        activeGhost = null;
+        instrumentState = InstrumentState.Idle;
+        
+        if (radialProgressObject != null)
+        {
+            radialProgressObject.SetActive(true);
+        }
+        
+        if (debugText != null)
+        {
+            debugText.text = "";
         }
     }
 }
