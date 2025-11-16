@@ -1,14 +1,14 @@
 # 🎵 Boxing Orchestra
 
 > A VR music application that enables you to play realistic 3D instruments, record your movements, and see ghost replays of your performance overlaid in space, and some fun surprises at the end. 
-
+Made in the "All Right Boys" Conference Room in Huang Engineering Center
 ![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-black?logo=unity)
 ![Meta Quest](https://img.shields.io/badge/Meta%20Quest-VR-blue)
 ![OpenXR](https://img.shields.io/badge/OpenXR-1.14.3-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 
-### Key Features
+## Key Features
 
 - 🎹 **Virtual Instruments**: Interact with piano, guitar, and drums using natural hand movements
 - 👻 **Motion Recording**: Capture your performance and visualize it as ghost replays 
@@ -39,12 +39,6 @@
 - Complete creative freedom
 - Build your own compositions
 
-### Unity Packages
-- **TextMeshPro** v3.0.9 - High-quality UI text rendering
-- **Timeline** v1.7.7 - Animation sequencing
-- **Visual Scripting** v1.9.4 - Node-based scripting support
-- **Newtonsoft.Json** v3.2.1 - JSON serialization
-- **Unity XR Interaction Toolkit** - VR controller input handling
 
 ## 📦 Assets
 ### 3D Models -- generated with the help of Nanobanana and Hunyuan
@@ -53,14 +47,16 @@
 All open source and free of charge.
 We used Claude Code, ChatGPT, and Gemini for help during the project. 
 
+### Unity Packages
+- **TextMeshPro** v3.0.9 - High-quality UI text rendering
+- **Timeline** v1.7.7 - Animation sequencing
+- **Visual Scripting** v1.9.4 - Node-based scripting support
+- **Newtonsoft.Json** v3.2.1 - JSON serialization
+- **Unity XR Interaction Toolkit** - VR controller input handling
 
 ## 📄 MIT License
-See the [LICENSE](LICENSE) file for details.
-
 
 ## 🎬 Demo
 
-<div align="center">
-  Made with ❤️ and VR controllers
-</div>
+
 
