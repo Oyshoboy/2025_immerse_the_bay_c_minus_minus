@@ -5,6 +5,7 @@ Call OnTrigger() to unmute and reset timer.
 Toggle 'play' to start or stop playback.
 */
 
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
@@ -26,10 +27,19 @@ public class GodmodeController : MonoBehaviour
     
     public void OnTrigger()
     {
+        TriggerTheMusic();
+    }
+
+    private void TriggerTheMusic()
+    {
         timer = timeoutDuration;
         audioSource.mute = false;
     }
-    
+
+    public void TriggerMusicExternally(){
+        TriggerTheMusic();
+    }
+
     void Update()
     {
         if (play && (audioSource.clip != clips[songIndex] || !audioSource.isPlaying))
