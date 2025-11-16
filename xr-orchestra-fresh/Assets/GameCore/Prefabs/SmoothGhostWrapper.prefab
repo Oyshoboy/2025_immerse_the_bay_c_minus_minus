@@ -430,8 +430,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 24
-  rotationSmoothness: 24
+  positionSmoothness: 30
+  rotationSmoothness: 30
 --- !u!114 &1923078588463814971
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,8 +550,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 24
-  rotationSmoothness: 24
+  positionSmoothness: 30
+  rotationSmoothness: 30
 --- !u!1 &9164220708144200159
 GameObject:
   m_ObjectHideFlags: 0
@@ -600,8 +600,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  positionSmoothness: 24
-  rotationSmoothness: 24
+  positionSmoothness: 30
+  rotationSmoothness: 30
 --- !u!114 &5369835567827564450
 MonoBehaviour:
   m_ObjectHideFlags: 0

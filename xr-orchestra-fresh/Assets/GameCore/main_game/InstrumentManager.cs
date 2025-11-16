@@ -107,9 +107,7 @@ public class InstrumentManager : MonoBehaviour
             
             if (radialProgressController != null)
             {
-                float duration = motionRecorder.GetRecordingDuration();
-                radialProgressController.SetCooldownDuration(duration);
-                radialProgressController.StartCooldown();
+                radialProgressController.SetProgress(0f);
             }
         }
     }
@@ -163,7 +161,16 @@ public class InstrumentManager : MonoBehaviour
             return;
         }
 
-        float remainingTime = motionRecorder.GetRecordingDuration() - motionRecorder.GetRecordingTimer();
+        float currentTime = motionRecorder.GetRecordingTimer();
+        float totalDuration = motionRecorder.GetRecordingDuration();
+        float progress = currentTime / totalDuration;
+
+        if (radialProgressController != null)
+        {
+            radialProgressController.SetProgress(progress);
+        }
+
+        float remainingTime = totalDuration - currentTime;
         int countdown = Mathf.CeilToInt(remainingTime);
         
         if (debugText != null)

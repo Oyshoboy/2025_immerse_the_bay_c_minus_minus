@@ -94,7 +94,7 @@ public class RadialProgressController : MonoBehaviour
         if (targetRenderer == null) return;
         
         targetRenderer.GetPropertyBlock(propertyBlock);
-        propertyBlock.SetFloat(ProgressPropertyID, currentProgress);
+        propertyBlock.SetFloat(ProgressPropertyID, currentProgress * 100f);
         targetRenderer.SetPropertyBlock(propertyBlock);
     }
     

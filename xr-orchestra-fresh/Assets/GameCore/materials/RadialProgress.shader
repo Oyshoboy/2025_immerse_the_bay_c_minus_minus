@@ -2,7 +2,7 @@ Shader "Custom/RadialProgress"
 {
     Properties
     {
-        _Progress ("Progress", Range(0, 1)) = 0
+        _Progress ("Progress", Range(0, 100)) = 0
         _FillColor ("Fill Color", Color) = (0, 1, 0, 1)
         _EmptyColor ("Empty Color", Color) = (0.2, 0.2, 0.2, 0.3)
         _InnerRadius ("Inner Radius", Range(0, 0.5)) = 0
@@ -74,7 +74,7 @@ Shader "Custom/RadialProgress"
                 angle = (angle + 90.0) % 360.0;
                 if (angle < 0) angle += 360.0;
                 
-                float progressAngle = _Progress * 360.0;
+                float progressAngle = _Progress * 3.6;
                 
                 fixed4 col = angle <= progressAngle ? _FillColor : _EmptyColor;
                 
