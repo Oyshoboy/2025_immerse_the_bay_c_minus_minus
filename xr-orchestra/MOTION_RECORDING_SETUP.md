@@ -51,7 +51,7 @@ Add MotionRecorder to your Wrapper GameObject:
 ## Customization
 
 ### Change Ghost Appearance
-Edit the generated prefabs in `Assets/Prefabs/` or modify `GhostPrefabGenerator.cs` and regenerate.
+Edit the generated prefabs in `Assets/Prefabs/` or modify `Assets/Scripts/main_game/MotionRecording/Editor/GhostPrefabGenerator.cs` and regenerate.
 
 ### Change Recording Duration
 Adjust "Recording Duration" on MotionRecorder component (default: 10s).
@@ -60,7 +60,7 @@ Adjust "Recording Duration" on MotionRecorder component (default: 10s).
 Modify "Record Key" on MotionRecorder component (default: R key).
 
 ### Use VR Controller Button
-In `MotionRecorder.cs`, replace `HandleInput()` method:
+In `Assets/Scripts/main_game/MotionRecording/Runtime/MotionRecorder.cs`, replace `HandleInput()` method:
 
 ```csharp
 private void HandleInput()
