@@ -1,11 +1,13 @@
 # 🎵 Boxing Orchestra
 
-> A VR music application that enables you to play realistic 3D instruments, record your movements, and see ghost replays of your performance overlaid in space, and some fun surprises at the end. 
+> A VR music application that enables you to play realistic 3D instruments, record your movements, and see ghost replays of your performance overlaid in space, and some fun surprises at the end.
+
+
 Made in the "All Right Boys" Conference Room in Huang Engineering Center
-![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-black?logo=unity)
-![Meta Quest](https://img.shields.io/badge/Meta%20Quest-VR-blue)
-![OpenXR](https://img.shields.io/badge/OpenXR-1.14.3-orange)
-![License](https://img.shields.io/badge/license-MIT-green)
+
+
+## 🎬 Demo
+
 
 
 ## Key Features
@@ -18,14 +20,14 @@ Made in the "All Right Boys" Conference Room in Huang Engineering Center
 
 
 ## 🎮 How to Play
-| **Grab Instrument** | Grip trigger near instrument |
-| **Play Note/Sound** | Touch instrument with controller |
-| **Start Recording** | 
-| **Stop Recording** | 
-|**See Ghost Spawning to Play the Previous Instrument**|
-| **Move Onto Next Instrument**|
-|**Knock a Ghost Out if You Feel Inclined to**|
-｜**See Your Concert at Work**|
+- **Grab Instrument** Grip trigger near instrument
+- **Play Note/Sound**  Touch instrument with controller
+- **Start Recording** 
+- **Stop Recording**
+- **See Ghost Spawning to Play the Previous Instrument**
+- **Move Onto Next Instrument**
+- **Knock a Ghost Out if You Feel Inclined to**
+- **See Your Concert at Work**
 
 ### Game Modes
 
@@ -55,8 +57,11 @@ We used Claude Code, ChatGPT, and Gemini for help during the project.
 - **Unity XR Interaction Toolkit** - VR controller input handling
 
 ## 📄 MIT License
+![Unity](https://img.shields.io/badge/Unity-2022.3.62f3-black?logo=unity)
+![Meta Quest](https://img.shields.io/badge/Meta%20Quest-VR-blue)
+![OpenXR](https://img.shields.io/badge/OpenXR-1.14.3-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-## 🎬 Demo
 
 
 
