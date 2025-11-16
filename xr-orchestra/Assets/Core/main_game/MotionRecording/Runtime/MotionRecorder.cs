@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MotionRecorder : MonoBehaviour
@@ -20,6 +21,7 @@ public class MotionRecorder : MonoBehaviour
     [SerializeField] private GameObject leftHandGhostPrefab;
     [SerializeField] private GameObject rightHandGhostPrefab;
     [SerializeField] private GameObject smoothGhostPrefab;
+    [SerializeField] private int maxGhosts = 5;
 
     private RecorderState state = RecorderState.Idle;
     private MotionRecording currentRecording;
@@ -27,9 +29,8 @@ public class MotionRecorder : MonoBehaviour
     private float sampleTimer;
     private float sampleInterval;
 
-    private GameObject ghostRoot;
-    private GameObject actualGhostParent;
-    private GameObject smoothGhostInstance;
+    private List<GameObject> ghostRoots = new List<GameObject>();
+    private int ghostCount = 0;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class MotionRecorder : MonoBehaviour
     {
         if (Input.GetKeyDown(recordKey) && state == RecorderState.Idle)
         {
+            DestroyGhosts();
             StartRecording();
         }
     }
@@ -58,8 +60,6 @@ public class MotionRecorder : MonoBehaviour
         currentRecording.Clear();
         recordingTimer = 0f;
         sampleTimer = 0f;
-
-        DestroyGhosts();
     }
 
     private void UpdateRecording()
@@ -114,16 +114,22 @@ public class MotionRecorder : MonoBehaviour
         state = RecorderState.Playing;
         currentRecording.duration = recordingTimer;
         SpawnGhosts();
+        
+        ghostCount++;
+        if (ghostCount < maxGhosts)
+        {
+            StartRecording();
+        }
     }
 
     private void SpawnGhosts()
     {
-        ghostRoot = new GameObject("Ghost");
+        GameObject ghostRoot = new GameObject("Ghost");
         ghostRoot.transform.SetParent(wrapper);
         ghostRoot.transform.localPosition = Vector3.zero;
         ghostRoot.transform.localRotation = Quaternion.identity;
 
-        actualGhostParent = new GameObject("ActualGhost");
+        GameObject actualGhostParent = new GameObject("ActualGhost");
         actualGhostParent.transform.SetParent(ghostRoot.transform);
         actualGhostParent.transform.localPosition = Vector3.zero;
         actualGhostParent.transform.localRotation = Quaternion.identity;
@@ -136,26 +142,26 @@ public class MotionRecorder : MonoBehaviour
         {
             headGhost = Instantiate(headGhostPrefab, actualGhostParent.transform);
             var player = headGhost.AddComponent<MotionPlayer>();
-            player.Initialize(currentRecording.headSnapshots, currentRecording.duration);
+            player.Initialize(new List<TransformSnapshot>(currentRecording.headSnapshots), currentRecording.duration);
         }
 
         if (leftHandGhostPrefab != null && currentRecording.leftHandSnapshots.Count > 0)
         {
             leftHandGhost = Instantiate(leftHandGhostPrefab, actualGhostParent.transform);
             var player = leftHandGhost.AddComponent<MotionPlayer>();
-            player.Initialize(currentRecording.leftHandSnapshots, currentRecording.duration);
+            player.Initialize(new List<TransformSnapshot>(currentRecording.leftHandSnapshots), currentRecording.duration);
         }
 
         if (rightHandGhostPrefab != null && currentRecording.rightHandSnapshots.Count > 0)
         {
             rightHandGhost = Instantiate(rightHandGhostPrefab, actualGhostParent.transform);
             var player = rightHandGhost.AddComponent<MotionPlayer>();
-            player.Initialize(currentRecording.rightHandSnapshots, currentRecording.duration);
+            player.Initialize(new List<TransformSnapshot>(currentRecording.rightHandSnapshots), currentRecording.duration);
         }
 
         if (smoothGhostPrefab != null)
         {
-            smoothGhostInstance = Instantiate(smoothGhostPrefab, ghostRoot.transform);
+            GameObject smoothGhostInstance = Instantiate(smoothGhostPrefab, ghostRoot.transform);
             smoothGhostInstance.name = "SmoothGhost";
             
             var initializer = smoothGhostInstance.GetComponent<SmoothGhostInitializer>();
@@ -168,11 +174,18 @@ public class MotionRecorder : MonoBehaviour
                 );
             }
         }
+        
+        ghostRoots.Add(ghostRoot);
     }
 
     private void DestroyGhosts()
     {
-        if (ghostRoot != null) Destroy(ghostRoot);
+        foreach (var ghost in ghostRoots)
+        {
+            if (ghost != null) Destroy(ghost);
+        }
+        ghostRoots.Clear();
+        ghostCount = 0;
     }
 
     public RecorderState GetState()
