@@ -2056,7 +2056,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 943485126}
-  - component: {fileID: 943485130}
+  - component: {fileID: 943485127}
   m_Layer: 0
   m_Name: rightHand
   m_TagString: Untagged
@@ -2080,7 +2080,7 @@ Transform:
   - {fileID: 1276160801}
   m_Father: {fileID: 815282432}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -15}
---- !u!114 &943485130
+--- !u!114 &943485127
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2089,7 +2089,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 943485125}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab280740dd4fe469f95ae488d20cdd1a, type: 3}
+  m_Script: {fileID: 11500000, guid: be2674f6cf20c48589257b475ea0ccc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 165171735}
@@ -2278,7 +2278,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1096513662}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 715f88eeb90044b099290c921c0704d5, type: 3}
+  m_Script: {fileID: 11500000, guid: 7db5cc6fdc516451483313daf4c08ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   wrapper: {fileID: 815282432}
@@ -2300,7 +2300,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1194805358}
-  - component: {fileID: 1194805362}
+  - component: {fileID: 1194805359}
   m_Layer: 0
   m_Name: leftHand
   m_TagString: Untagged
@@ -2324,7 +2324,7 @@ Transform:
   - {fileID: 707305287}
   m_Father: {fileID: 815282432}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1194805362
+--- !u!114 &1194805359
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2333,7 +2333,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1194805357}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab280740dd4fe469f95ae488d20cdd1a, type: 3}
+  m_Script: {fileID: 11500000, guid: be2674f6cf20c48589257b475ea0ccc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 336652290}
@@ -3076,7 +3076,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1586503342}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab280740dd4fe469f95ae488d20cdd1a, type: 3}
+  m_Script: {fileID: 11500000, guid: be2674f6cf20c48589257b475ea0ccc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1425279385}
