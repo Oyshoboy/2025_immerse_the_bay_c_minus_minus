@@ -34,7 +34,7 @@ public class GhostPunchDetector : MonoBehaviour
         if (velocityMagnitude >= punchVelocityThreshold)
         {
             Debug.Log("[GhostPunchDetector] PUNCH DETECTED! Calling InstrumentManager.OnGhostPunched()");
-            instrumentManager.OnGhostPunched();
+            instrumentManager.OnGhostPunched(velocityTracker.Velocity);
         }
     }
 }

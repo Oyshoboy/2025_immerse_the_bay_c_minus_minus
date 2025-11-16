@@ -23,6 +23,7 @@ public class InstrumentManager : MonoBehaviour
     [SerializeField] private Material radialProgressMaterial;
     [SerializeField] private GameObject radialProgressObject;
     [SerializeField] private GameObject dummyFXObject;
+    [SerializeField] private float dummyUpwardForce = 2f;
 
     [Header("Debug State")]
     [SerializeField] private InstrumentState debugInstrumentState;
@@ -36,6 +37,8 @@ public class InstrumentManager : MonoBehaviour
     private RadialProgressController radialProgressController;
     private GameObject activeGhost;
     private string lastStatusText = "";
+    private GameObject pendingDummyFX;
+    private Vector3 pendingForceVelocity;
 
     private void Awake()
     {
@@ -169,6 +172,23 @@ public class InstrumentManager : MonoBehaviour
         UpdateDebugInfo();
     }
 
+    private void FixedUpdate()
+    {
+        if (pendingDummyFX != null)
+        {
+            Rigidbody rb = pendingDummyFX.GetComponent<Rigidbody>();
+            if (rb == null)
+            {
+                rb = pendingDummyFX.AddComponent<Rigidbody>();
+            }
+            
+            Vector3 forceWithUpward = pendingForceVelocity + (Vector3.up * dummyUpwardForce);
+            rb.AddForce(forceWithUpward * rb.mass, ForceMode.Impulse);
+            pendingDummyFX = null;
+            pendingForceVelocity = Vector3.zero;
+        }
+    }
+
     private void UpdateIdleStatus()
     {
         if (debugText == null) return;
@@ -250,9 +270,18 @@ public class InstrumentManager : MonoBehaviour
         }
     }
 
-    public void OnGhostPunched()
+    public void OnGhostPunched(Vector3 punchVelocity)
     {
         if (activeGhost == null) return;
+        
+        Vector3 ghostPosition = activeGhost.transform.position;
+        
+        if (dummyFXObject != null)
+        {
+            pendingDummyFX = Instantiate(dummyFXObject, ghostPosition, Quaternion.identity);
+            pendingForceVelocity = punchVelocity;
+            Destroy(pendingDummyFX, 5f);
+        }
         
         if (motionRecorder != null)
         {
