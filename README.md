@@ -45,7 +45,7 @@ Made in the "All Right Boys" Conference Room in Huang Engineering Center
 ## 📦 Assets
 ### 3D Models -- generated with the help of Nanobanana and Hunyuan
 ### Audio Files -- from backtracks4all.com and Samplefocus.com 
-### Visual Assets - **Skybox HDRI**: 4K atmospheric skybox, from Poly Haven
+### Visual Assets - **Skybox HDRI**: 4K atmospheric skybox, from Poly Haven, 3d dummy from mixamo.com
 All open source and free of charge.
 We used Claude Code, ChatGPT, and Gemini for help during the project. 
 
