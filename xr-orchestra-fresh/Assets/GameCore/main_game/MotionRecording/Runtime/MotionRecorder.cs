@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +30,8 @@ public class MotionRecorder : MonoBehaviour
     private float sampleTimer;
     private float sampleInterval;
 
+    public bool startRecordingOnStart = true;
+
     private List<GameObject> ghostRoots = new List<GameObject>();
     private int ghostCount = 0;
 
@@ -36,7 +39,15 @@ public class MotionRecorder : MonoBehaviour
     {
         currentRecording = new MotionRecording();
         sampleInterval = 1f / sampleRate;
-        Invoke(nameof(StartRecording), 5f);
+
+        RecordOnStart();
+    }
+
+    private void RecordOnStart()
+    {
+        if(startRecordingOnStart){
+            Invoke(nameof(StartRecording), 5f);
+        }
     }
 
     void Update()
