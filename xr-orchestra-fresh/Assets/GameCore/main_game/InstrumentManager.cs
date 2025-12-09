@@ -8,6 +8,14 @@ public class InstrumentManager : MonoBehaviour
 {
     public enum InstrumentState { Idle, Recording, Playing }
 
+    [Header("Mode Switching")]
+    [Tooltip("If true, disables Godmode (auto) and enables ProMode (manual).")]
+    [SerializeField] private bool useProMode = false; 
+
+    // --- ADDED REFERENCE ---
+    [SerializeField] private ProModeController proModeController; 
+    // -----------------------
+
     [Header("Debug Display")]
     [SerializeField] private TMP_Text debugText;
     [SerializeField] private int maxDebugLines = 10;
@@ -48,13 +56,47 @@ public class InstrumentManager : MonoBehaviour
         {
             radialProgressController = radialProgressObject.GetComponent<RadialProgressController>();
         }
+        
+        // --- APPLY MODE SETTINGS ON STARTUP ---
+        ApplyModeSettings();
+    }
+
+    // --- UPDATED HELPER TO TOGGLE MODES ---
+    public void SetProMode(bool enabled)
+    {
+        useProMode = enabled;
+        ApplyModeSettings();
+    }
+
+    private void ApplyModeSettings()
+    {
+        // 1. Handle Godmode
+        if (godmodeController != null) 
+        {
+            godmodeController.enabled = !useProMode;
+        }
+        // 2. Handle ProMode
+        if (proModeController != null)
+        {
+            proModeController.enabled = useProMode;
+        }
+    }
+
+    // Optional: Update in editor when you check the box
+    private void OnValidate()
+    {
+        ApplyModeSettings();
     }
 
     public void InteractionCapture(string message)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return; // Let ProModeController handle the sound
+        // -------------------
+
         TryStartRecording();
 
-        godmodeController.TriggerMusicExternally();
+        if (godmodeController != null) godmodeController.TriggerMusicExternally();
 
         if (string.IsNullOrEmpty(message)) return;
         OVRInput.Controller controller = message.ToLower().Contains("left")
@@ -68,6 +110,10 @@ public class InstrumentManager : MonoBehaviour
 
     public void InteractionCapture(Collider collider, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return;
+        // -------------------
+
         if (instrumentState == InstrumentState.Playing) return;
         if (collider == null) return;
 
@@ -88,6 +134,10 @@ public class InstrumentManager : MonoBehaviour
 
     public void InteractionCapture(GameObject target, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return;
+        // -------------------
+
         if (instrumentState == InstrumentState.Playing) return;
         if (target == null) return;
 
