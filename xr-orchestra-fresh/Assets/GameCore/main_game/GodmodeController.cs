@@ -18,11 +18,25 @@ public class GodmodeController : MonoBehaviour
     
     private AudioSource audioSource;
     private float timer;
-    
-    void Start()
+
+    void Awake()
     {
         audioSource = GetComponent<AudioSource>();
         audioSource.loop = true;
+
+        if (clips != null && clips.Length > 0 && songIndex < clips.Length)
+        {
+            audioSource.clip = clips[songIndex];
+        }
+    }
+    
+    void OnDisable()
+    {
+        if (audioSource != null)
+        {
+            audioSource.Stop();
+            play = false; 
+        }
     }
     
     public void OnTrigger()
@@ -42,6 +56,8 @@ public class GodmodeController : MonoBehaviour
 
     void Update()
     {
+        if (clips == null || clips.Length == 0) return;
+
         if (play && (audioSource.clip != clips[songIndex] || !audioSource.isPlaying))
         {
             audioSource.clip = clips[songIndex];

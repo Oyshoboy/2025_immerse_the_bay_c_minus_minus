@@ -6,6 +6,16 @@ using TMPro;
 
 public class InstrumentManager : MonoBehaviour
 {
+    public enum InstrumentState { Idle, Recording, Playing }
+
+    [Header("Mode Switching")]
+    [Tooltip("If true, disables Godmode (auto) and enables ProMode (manual).")]
+    [SerializeField] private bool useProMode = false; 
+
+    // --- ADDED REFERENCE ---
+    [SerializeField] private ProModeController proModeController; 
+    // -----------------------
+
     [Header("Debug Display")]
     [SerializeField] private TMP_Text debugText;
     [SerializeField] private int maxDebugLines = 10;
@@ -17,18 +27,78 @@ public class InstrumentManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GodmodeController godmodeController;
+    [SerializeField] private MotionRecorder motionRecorder;
+    [SerializeField] private Material radialProgressMaterial;
+    [SerializeField] private GameObject radialProgressObject;
+    [SerializeField] private GameObject dummyFXObject;
+
+    [Header("Debug State")]
+    [SerializeField] private InstrumentState debugInstrumentState;
+    [SerializeField] private bool debugHasActiveGhost;
+    [SerializeField] private float debugRecordingProgress;
+
+    private static bool isAnyInstrumentRecording = false;
 
     private Queue<string> debugMessages = new Queue<string>();
+    private InstrumentState instrumentState = InstrumentState.Idle;
+    private RadialProgressController radialProgressController;
+    private GameObject activeGhost;
+    private string lastStatusText = "";
+    private GameObject pendingDummyFX;
+    private Vector3 pendingForceVelocity;
+
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip punchSound;
+
+    private void Awake()
+    {
+        if (radialProgressObject != null)
+        {
+            radialProgressController = radialProgressObject.GetComponent<RadialProgressController>();
+        }
+        
+        // --- APPLY MODE SETTINGS ON STARTUP ---
+        ApplyModeSettings();
+    }
+
+    // --- UPDATED HELPER TO TOGGLE MODES ---
+    public void SetProMode(bool enabled)
+    {
+        useProMode = enabled;
+        ApplyModeSettings();
+    }
+
+    private void ApplyModeSettings()
+    {
+        // 1. Handle Godmode
+        if (godmodeController != null) 
+        {
+            godmodeController.enabled = !useProMode;
+        }
+        // 2. Handle ProMode
+        if (proModeController != null)
+        {
+            proModeController.enabled = useProMode;
+        }
+    }
+
+    // Optional: Update in editor when you check the box
+    private void OnValidate()
+    {
+        ApplyModeSettings();
+    }
 
     public void InteractionCapture(string message)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return; // Let ProModeController handle the sound
+        // -------------------
+
+        TryStartRecording();
+
+        if (godmodeController != null) godmodeController.TriggerMusicExternally();
+
         if (string.IsNullOrEmpty(message)) return;
-
-        string timestamp = Time.time.ToString("F2");
-        string formattedMessage = $"[{timestamp}s] {message}";
-        
-        AddDebugMessage(formattedMessage);
-
         OVRInput.Controller controller = message.ToLower().Contains("left")
             ? OVRInput.Controller.LTouch
             : message.ToLower().Contains("right")
@@ -36,12 +106,18 @@ public class InstrumentManager : MonoBehaviour
                 : defaultHapticController;
 
         TriggerHaptic(controller);
-        godmodeController.TriggerMusicExternally();
     }
 
     public void InteractionCapture(Collider collider, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return;
+        // -------------------
+
+        if (instrumentState == InstrumentState.Playing) return;
         if (collider == null) return;
+
+        TryStartRecording();
 
         string timestamp = Time.time.ToString("F2");
         string objectName = collider.gameObject.name;
@@ -58,7 +134,14 @@ public class InstrumentManager : MonoBehaviour
 
     public void InteractionCapture(GameObject target, OVRInput.Controller controller = OVRInput.Controller.None)
     {
+        // --- ADDED CHECK ---
+        if (useProMode) return;
+        // -------------------
+
+        if (instrumentState == InstrumentState.Playing) return;
         if (target == null) return;
+
+        TryStartRecording();
 
         string timestamp = Time.time.ToString("F2");
         string objectName = target.name;
@@ -70,6 +153,23 @@ public class InstrumentManager : MonoBehaviour
         if (controller != OVRInput.Controller.None)
         {
             TriggerHaptic(controller);
+        }
+    }
+
+    private void TryStartRecording()
+    {
+        if (isAnyInstrumentRecording) return;
+        
+        if (instrumentState == InstrumentState.Idle && motionRecorder != null)
+        {
+            isAnyInstrumentRecording = true;
+            instrumentState = InstrumentState.Recording;
+            motionRecorder.StartRecordingExternally(this);
+            
+            if (radialProgressController != null)
+            {
+                radialProgressController.SetProgress(0f);
+            }
         }
     }
 
@@ -102,6 +202,155 @@ public class InstrumentManager : MonoBehaviour
         if (debugText == null) return;
 
         debugText.text = string.Join("\n", debugMessages);
+    }
+
+    private void Update()
+    {
+        if (instrumentState == InstrumentState.Recording)
+        {
+            UpdateRecordingProgress();
+        }
+        else if (instrumentState == InstrumentState.Idle)
+        {
+            UpdateIdleStatus();
+        }
+        UpdateDebugInfo();
+    }
+
+    private void FixedUpdate()
+    {
+        if (pendingDummyFX != null)
+        {
+            PlayPunchSound();
+            Rigidbody rb = pendingDummyFX.GetComponent<Rigidbody>();
+            if (rb == null)
+            {
+                rb = pendingDummyFX.AddComponent<Rigidbody>();
+            }
+            
+            rb.AddForce(pendingForceVelocity * rb.mass, ForceMode.Impulse);
+            pendingDummyFX = null;
+            pendingForceVelocity = Vector3.zero;
+        }
+    }
+
+    private void UpdateIdleStatus()
+    {
+        if (debugText == null) return;
+
+        string targetStatus = isAnyInstrumentRecording ? "busy" : "ready";
+        
+        if (lastStatusText != targetStatus)
+        {
+            debugText.text = targetStatus;
+            lastStatusText = targetStatus;
+        }
+    }
+
+    private void UpdateDebugInfo()
+    {
+        debugInstrumentState = instrumentState;
+        debugHasActiveGhost = activeGhost != null;
+        
+        if (instrumentState == InstrumentState.Recording && motionRecorder != null)
+        {
+            float currentTime = motionRecorder.GetRecordingTimer();
+            float totalDuration = motionRecorder.GetRecordingDuration();
+            debugRecordingProgress = totalDuration > 0 ? (currentTime / totalDuration) : 0f;
+        }
+        else
+        {
+            debugRecordingProgress = 0f;
+        }
+    }
+
+    private void UpdateRecordingProgress()
+    {
+        if (motionRecorder == null) return;
+
+        if (motionRecorder.GetState() == MotionRecorder.RecorderState.Idle)
+        {
+            OnRecordingComplete();
+            return;
+        }
+
+        float currentTime = motionRecorder.GetRecordingTimer();
+        float totalDuration = motionRecorder.GetRecordingDuration();
+        float progress = currentTime / totalDuration;
+
+        if (radialProgressController != null)
+        {
+            radialProgressController.SetProgress(progress);
+        }
+
+        float remainingTime = totalDuration - currentTime;
+        int countdown = Mathf.CeilToInt(remainingTime);
+        
+        if (debugText != null)
+        {
+            debugText.text = $"Recording {countdown}...";
+            lastStatusText = debugText.text;
+        }
+    }
+
+    private void OnRecordingComplete()
+    {
+        isAnyInstrumentRecording = false;
+        instrumentState = InstrumentState.Playing;
+        
+        if (motionRecorder != null)
+        {
+            activeGhost = motionRecorder.GetLastSpawnedGhost();
+        }
+        
+        if (radialProgressObject != null)
+        {
+            radialProgressObject.SetActive(false);
+        }
+        
+        if (debugText != null)
+        {
+            debugText.text = "Playing...";
+            lastStatusText = debugText.text;
+        }
+    }
+
+    public void OnGhostPunched(Vector3 punchVelocity)
+    {
+        if (activeGhost == null) return;
+        
+        var ghostInitializer = activeGhost.GetComponentInChildren<SmoothGhostInitializer>();
+
+        var targetPosition = ghostInitializer.GetTargetPosition();
+        
+        if (dummyFXObject != null)
+        {
+            pendingDummyFX = Instantiate(dummyFXObject, targetPosition.position, targetPosition.rotation);
+            pendingForceVelocity = punchVelocity;
+            Destroy(pendingDummyFX, 5f);
+        }
+        
+        if (motionRecorder != null)
+        {
+            motionRecorder.RemoveGhost(activeGhost);
+        }
+        
+        activeGhost = null;
+        instrumentState = InstrumentState.Idle;
+        
+        if (radialProgressObject != null)
+        {
+            radialProgressObject.SetActive(true);
+        }
+        
+        lastStatusText = "";
+    }
+
+    private void PlayPunchSound()
+    {
+       float pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+       audioSource.pitch = pitch;
+       audioSource.PlayOneShot(punchSound);
     }
 }
 

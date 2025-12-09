@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MotionRecorder : MonoBehaviour
 {
-    public enum RecorderState { Idle, Recording, Playing }
+    public enum RecorderState { Idle, Recording }
 
     [Header("Tracking Targets")]
     [SerializeField] private Transform wrapper;
@@ -24,6 +24,14 @@ public class MotionRecorder : MonoBehaviour
     [SerializeField] private GameObject smoothGhostPrefab;
     [SerializeField] private int maxGhosts = 5;
 
+    [Header("Debug Info")]
+    [SerializeField] private RecorderState debugState;
+    [SerializeField] private float debugRecordingTimer;
+    [SerializeField] private int debugHeadSnapshotCount;
+    [SerializeField] private int debugLeftHandSnapshotCount;
+    [SerializeField] private int debugRightHandSnapshotCount;
+    [SerializeField] private int debugActiveGhostCount;
+
     private RecorderState state = RecorderState.Idle;
     private MotionRecording currentRecording;
     private float recordingTimer;
@@ -34,6 +42,7 @@ public class MotionRecorder : MonoBehaviour
 
     private List<GameObject> ghostRoots = new List<GameObject>();
     private int ghostCount = 0;
+    private InstrumentManager currentInstrumentManager;
 
     void Start()
     {
@@ -54,6 +63,17 @@ public class MotionRecorder : MonoBehaviour
     {
         HandleInput();
         UpdateRecording();
+        UpdateDebugInfo();
+    }
+
+    private void UpdateDebugInfo()
+    {
+        debugState = state;
+        debugRecordingTimer = recordingTimer;
+        debugHeadSnapshotCount = currentRecording?.headSnapshots.Count ?? 0;
+        debugLeftHandSnapshotCount = currentRecording?.leftHandSnapshots.Count ?? 0;
+        debugRightHandSnapshotCount = currentRecording?.rightHandSnapshots.Count ?? 0;
+        debugActiveGhostCount = ghostRoots.Count;
     }
 
     private void HandleInput()
@@ -61,6 +81,13 @@ public class MotionRecorder : MonoBehaviour
         if (Input.GetKeyDown(recordKey) && state == RecorderState.Idle)
         {
             DestroyGhosts();
+            StartRecording();
+        }
+    }
+
+    public void StartRecordingExternally(InstrumentManager instrumentManager){
+        if(state == RecorderState.Idle){
+            currentInstrumentManager = instrumentManager;
             StartRecording();
         }
     }
@@ -122,15 +149,9 @@ public class MotionRecorder : MonoBehaviour
 
     private void StopRecording()
     {
-        state = RecorderState.Playing;
         currentRecording.duration = recordingTimer;
         SpawnGhosts();
-        
-        ghostCount++;
-        if (ghostCount < maxGhosts)
-        {
-            StartRecording();
-        }
+        state = RecorderState.Idle;
     }
 
     private void SpawnGhosts()
@@ -184,6 +205,12 @@ public class MotionRecorder : MonoBehaviour
                     rightHandGhost != null ? rightHandGhost.transform : null
                 );
             }
+            
+            var punchDetector = smoothGhostInstance.GetComponentInChildren<GhostPunchDetector>();
+            if (punchDetector != null && currentInstrumentManager != null)
+            {
+                punchDetector.SetInstrumentManager(currentInstrumentManager);
+            }
         }
         
         ghostRoots.Add(ghostRoot);
@@ -204,11 +231,38 @@ public class MotionRecorder : MonoBehaviour
         return state;
     }
 
+    public float GetRecordingDuration()
+    {
+        return recordingDuration;
+    }
+
+    public float GetRecordingTimer()
+    {
+        return recordingTimer;
+    }
+
     public void ResetToIdle()
     {
         state = RecorderState.Idle;
         DestroyGhosts();
         currentRecording.Clear();
+    }
+
+    public GameObject GetLastSpawnedGhost()
+    {
+        if (ghostRoots.Count > 0)
+        {
+            return ghostRoots[ghostRoots.Count - 1];
+        }
+        return null;
+    }
+
+    public void RemoveGhost(GameObject ghost)
+    {
+        if (ghost == null) return;
+        
+        ghostRoots.Remove(ghost);
+        Destroy(ghost);
     }
 }
 
